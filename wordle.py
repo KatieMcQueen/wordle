@@ -6,6 +6,7 @@ guesses = []
 goalWord = ''
 state = 'generator'
 tries = 0
+cheats = False
 
 helpText = '''Exit: end the program
 New: generate a new word
@@ -73,9 +74,12 @@ while(state != 'end'):
                     print('Correct!')
                     state = 'generator'
                     correct = True
-                tries += 1
-                result = assessGuess(command)
-                printResult(result, command)
+                if command in words or cheats:
+                    tries += 1
+                    result = assessGuess(command)
+                    printResult(result, command)
+                else:
+                    print("word not in dictionary")
                 if tries == 6 and not correct:
                     print("You lost. Try again.")
                     state = 'generator'
@@ -93,5 +97,9 @@ while(state != 'end'):
                             goalWord = newWord
                         else:
                             print("Wrong length")
+                    case 'cheaton':
+                        cheats = True
+                    case 'cheatsoff':
+                        cheats = False
                     case 'help':
                         print(helpText)
