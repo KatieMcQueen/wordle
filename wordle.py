@@ -12,6 +12,9 @@ helpText = '''Exit: end the program
 New: generate a new word
 Peek: print the hidden word
 Poke: set the hidden word
+cheatson: turns cheat mode on
+cheatsoff: turns cheat mode off
+cheats: toggles cheats mode
 Help: print this text'''
 
 with open('answers.txt') as file:
@@ -26,21 +29,46 @@ words = answers + guesses
 
 def assessGuess(guess):
     results = [None] * 5
+    dupes = []
     for i in range(len(guess)):
         letterGuess = guess[i]
         letterGoal = goalWord[i]
         count = guess.count(letterGuess)
         if letterGuess == letterGoal:
             results[i] = 'correct'
+            if count > 0:
+                letterIndex = None
+                for index in range(len(dupes)):
+                    if dupes[index][0] == letterGuess:
+                        letterIndex = index
+                if letterIndex == None:
+                    letterIndex = len(dupes)
+                    dupes.append([letterGuess, count - 1])
+                dupes[letterIndex][1] -= 1
+
         elif letterGuess in goalWord:
-            results[i] = 'place'
+            if count == 1:
+                results[i] = 'place'
+            else:
+                letterIndex = None
+                for index in range(len(dupes)):
+                    if dupes[index][0] == letterGuess:
+                        letterIndex = index
+                if letterIndex == None:
+                    letterIndex = len(dupes)
+                    dupes.append([letterGuess, count - 1])
+                if dupes[letterIndex][1] == 0:
+                    results[i] = 'wrong'
+                if dupes[letterIndex][1] > 0:
+                    results[i] = 'place'
+                    dupes[letterIndex][1] -= 1
+
+
+
         else:
             results[i] = 'wrong'
 
     return(results)
-
-
-
 
 
 
@@ -82,6 +110,7 @@ while(state != 'end'):
                     print("word not in dictionary")
                 if tries == 6 and not correct:
                     print("You lost. Try again.")
+                    print("The word was: \x1b[2;30;41m" + goalWord + '\033[0;0m')
                     state = 'generator'
             case _:
                 match command: #when the input isn't 5 letters interpret it as a command
@@ -97,9 +126,18 @@ while(state != 'end'):
                             goalWord = newWord
                         else:
                             print("Wrong length")
-                    case 'cheaton':
+                    case 'cheatson':
                         cheats = True
+                        print("Cheats on")
                     case 'cheatsoff':
                         cheats = False
+                        print("Cheats off")
+                    case 'cheats':
+                        if cheats:
+                            cheats = False
+                            print("Cheats off")
+                        elif not cheats:
+                            cheats = True
+                            print("Cheats on")
                     case 'help':
                         print(helpText)
