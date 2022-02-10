@@ -43,31 +43,34 @@ def assessGuess(guess):
                         letterIndex = index
                 if letterIndex == None:
                     letterIndex = len(dupes)
-                    dupes.append([letterGuess, count - 1])
+                    dupes.append([letterGuess, goalWord.count(letterGuess) - 1])
                 dupes[letterIndex][1] -= 1
 
         elif letterGuess in goalWord:
             if count == 1:
                 results[i] = 'place'
             else:
-                letterIndex = None
-                for index in range(len(dupes)):
-                    if dupes[index][0] == letterGuess:
-                        letterIndex = index
-                if letterIndex == None:
-                    letterIndex = len(dupes)
-                    dupes.append([letterGuess, count - 1])
-                if dupes[letterIndex][1] == 0:
-                    results[i] = 'wrong'
-                if dupes[letterIndex][1] > 0:
-                    results[i] = 'place'
-                    dupes[letterIndex][1] -= 1
-
-
-
+                results[i] = 'check'
         else:
             results[i] = 'wrong'
-
+    for i, elm in enumerate(results):
+        if elm == 'check':
+            letterGuess = guess[i]
+            letterGoal = goalWord[i]
+            count = guess.count(letterGuess)
+            letterIndex = None
+            for index in range(len(dupes)):
+                if dupes[index][0] == letterGuess:
+                    letterIndex = index
+            if letterIndex == None:
+                letterIndex = len(dupes)
+                dupes.append([letterGuess, goalWord.count(letterGuess) - 1])
+            if dupes[letterIndex][1] > 0:
+                results[i] = 'place'
+                print(dupes[letterIndex][1])
+                dupes[letterIndex][1] -= 1
+            else:
+                results[i] = 'wrong'
     return(results)
 
 
